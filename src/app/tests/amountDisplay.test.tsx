@@ -11,7 +11,7 @@ describe('AmountDisplay', () => {
   });
 
   it('copies amount to clipboard when button is clicked', async () => {
-    // Mock clipboard
+
     const writeTextMock = jest.fn();
     Object.assign(navigator, {
       clipboard: {
