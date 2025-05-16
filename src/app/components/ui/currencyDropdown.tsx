@@ -1,5 +1,8 @@
 "use client";
 
+import { useAtom } from "jotai";
+import { selectedCurrencyAtom } from "@/app/state/atoms";
+
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
@@ -23,21 +26,17 @@ const currencies = [
   { label: "Litecoin", value: "LTC" },
 ];
 
-interface Props {
-  selected: string | null;
-  onChange: (currency: string) => void;
-}
-
-export const CurrencyDropdown = ({ selected, onChange }: Props) => {
+export const CurrencyDropdown = () => {
   const [open, setOpen] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
 
   const handleSelect = (currentValue: string) => {
-    onChange(currentValue);
+    setSelectedCurrency(currentValue);
     setOpen(false);
   };
 
   const selectedLabel =
-    currencies.find((c) => c.value === selected)?.label || "Select currency...";
+    currencies.find((c) => c.value === selectedCurrency)?.label || "Select currency...";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -70,7 +69,7 @@ export const CurrencyDropdown = ({ selected, onChange }: Props) => {
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4 text-primary",
-                      selected === currency.value
+                      selectedCurrency === currency.value
                         ? "opacity-100"
                         : "opacity-0"
                     )}

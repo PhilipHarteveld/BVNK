@@ -8,7 +8,7 @@ export default function ExpiredPage() {
       <div className="bg-white p-8 rounded-xl shadow w-full max-w-md text-center">
         <div className="flex justify-center mb-4">
           <div className="bg-red-100 p-4 rounded-full">
-            <AlertTriangle className="text-red-500 w-8 h-8" />
+            <AlertTriangle data-testid="alert-icon" className="text-red-500 w-8 h-8" />
           </div>
         </div>
         <h1 className="text-xl font-semibold mb-2">Payment details expired</h1>

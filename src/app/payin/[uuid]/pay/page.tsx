@@ -4,8 +4,9 @@ import { useParams } from "next/navigation";
 import { useQuoteSummary } from "@/app/features/quote/hooks/useQuoteSummary";
 import { useEffect, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { useAtomValue } from "jotai";
+import { selectedCurrencyAtom } from "@/app/state/atoms";
 
-// Optional: Type-safe currency label map
 const currencyLabels: Record<string, string> = {
   BTC: "Bitcoin",
   ETH: "Ethereum",
@@ -16,6 +17,9 @@ export default function PayQuotePage() {
   const { uuid } = useParams() as { uuid: string };
   const { data: quote } = useQuoteSummary(uuid);
   const [timeLeft, setTimeLeft] = useState<string>("");
+
+  const selectedCurrency = useAtomValue(selectedCurrencyAtom);
+  const currency = selectedCurrency || quote?.paidCurrency.currency;
 
   useEffect(() => {
     if (!quote?.expiryDate) return;
@@ -43,7 +47,6 @@ export default function PayQuotePage() {
   if (!quote) return <div className="p-8">Loading...</div>;
 
   const amount = quote.paidCurrency.amount;
-  const currency = quote.paidCurrency.currency;
   const address = quote.address?.address ?? "Unknown";
 
   const handleCopy = (text: string) => {
@@ -58,9 +61,8 @@ export default function PayQuotePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f1f3f9] px-4">
       <div className="bg-white p-8 rounded-xl shadow w-full max-w-md text-center">
-
         <h2 className="text-lg font-medium mb-2 text-textColor">
-          Pay with {currencyLabels[currency] || currency}
+            Pay with {currencyLabels[currency as string] || currency}
         </h2>
 
         <p className="text-sm text-textHeading mb-6">
