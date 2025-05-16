@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💸 Frontend HPP (Hosted Payments Page)
 
-## Getting Started
+A modern, scalable frontend for handling cryptocurrency and fiat payments, built with:
 
-First, run the development server:
+- ⚡️ [Next.js 15](https://nextjs.org/)
+- 🧪 [Jest + Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+- 🌊 [Tailwind CSS](https://tailwindcss.com/)
+- 🧠 [Jotai](https://jotai.org/) for atomic state management
+- 🔐 TypeScript & React best practices
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) `>=18`
+- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+
+---
+
+### 🛠️ Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/philipharteveld/frontend-hpp.git
+cd frontend-hpp
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run the app with Webpack (recommended for now)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+npm run dev
+Visit http://localhost:3000 in your browser.
 
-## Learn More
+http://localhost:3000/payin/[uuid]
+![alt text](image-1.png)
 
-To learn more about Next.js, take a look at the following resources:
+http://localhost:3000/payin/[uuid]/pay
+![alt text](image.png)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+http://localhost:3000/payin/[uuid]/expired
+![alt text](image-2.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Run tests
 
-## Deploy on Vercel
+npm test
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## hilip Harteveld
