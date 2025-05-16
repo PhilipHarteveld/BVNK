@@ -49,4 +49,4 @@ http://localhost:3000/payin/[uuid]/expired
 
 npm test
 
-## hilip Harteveld
+## Philip Harteveld
