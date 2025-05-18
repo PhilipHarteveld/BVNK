@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 import { selectedCurrencyAtom } from "@/state/atoms";
 
 import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import {
   Command,
   CommandGroup,
