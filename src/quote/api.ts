@@ -1,11 +1,11 @@
 
-import { QuoteSummarySchema } from '@/app/types/quote';
+import { QuoteSummary, QuoteSummarySchema } from '@/types/quote';
 import { apiClient } from '@/lib/axios';
 
 
 
 export const getQuoteSummary = async (uuid: string) => {
-  const { data } = await apiClient.get(`/pay/${uuid}/summary`);
+  const { data } = await apiClient.get<QuoteSummary>(`/pay/${uuid}/summary`);
 
   try {
     return QuoteSummarySchema.parse(data);
@@ -16,7 +16,7 @@ export const getQuoteSummary = async (uuid: string) => {
 };
 
 export const updateQuoteSummary = async (uuid: string, currency: string) => {
-  const { data } = await apiClient.put(`/pay/${uuid}/update/summary`, {
+  const { data } = await apiClient.put<QuoteSummary>(`/pay/${uuid}/update/summary`, {
     currency,
     payInMethod: "crypto",
   });

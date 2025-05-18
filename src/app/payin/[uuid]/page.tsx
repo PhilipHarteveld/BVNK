@@ -1,37 +1,26 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useQuoteSummary } from "@/app/features/quote/hooks/useQuoteSummary";
-import { acceptQuote, updateQuoteSummary } from "@/app/features/quote/api";
-import { CurrencyDropdown } from "@/app/components/ui/currencyDropdown";
+import { useQuoteSummary } from "@/app/payin/[uuid]/hooks/useQuoteSummary";
+import { acceptQuote, updateQuoteSummary } from "@/quote/api";
+
 import { useAtom } from "jotai";
-import { selectedCurrencyAtom } from "@/app/state/atoms";
+import { selectedCurrencyAtom } from "@/state/atoms";
+import { useCountdownTimer } from "@/hooks/useCountdownTimer";
+import { CurrencyDropdown } from "@/molecules/ui/currencyDropdown";
 
 export default function AcceptQuotePage() {
   const { uuid } = useParams() as { uuid: string };
   const router = useRouter();
   const { data: quote, refetch } = useQuoteSummary(uuid);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
-
-useEffect(() => {
-    if (!quote?.acceptanceExpiryDate) return;
-
-    const interval = setInterval(() => {
-        const now = Date.now();
-        const expiry = quote.acceptanceExpiryDate;
-        const secondsLeft = Math.floor((expiry! - now) / 1000); 
-        setTimeLeft(secondsLeft > 0 ? secondsLeft : 0);
-    }, 1000);
-
-    return () => clearInterval(interval);
-}, [quote?.acceptanceExpiryDate]);
+  const timeLeft = useCountdownTimer(quote?.acceptanceExpiryDate || 0, "seconds");
 
   useEffect(() => {
     if (selectedCurrency) {
-      updateQuoteSummary(uuid, selectedCurrency).then(refetch);
+      updateQuoteSummary(uuid, selectedCurrency).then(() => refetch());
     }
   }, [selectedCurrency, uuid, refetch]);
 

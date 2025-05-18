@@ -42,8 +42,8 @@ export const QuoteSummarySchema = z.object({
   refund: z.any().nullable().optional(),
   refunds: z.array(z.any()).optional(),
 
-  currencyOptions: z.array(z.any()).nullable().optional(), 
-  flow: z.string().nullable().optional(),                 
+  currencyOptions: z.array(z.any()).nullable().optional(),
+  flow: z.string().nullable().optional(),
   twoStep: z.boolean().optional(),
   pegged: z.boolean().optional(),
 

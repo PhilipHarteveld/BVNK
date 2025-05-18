@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider, createStore } from 'jotai';
-import { selectedCurrencyAtom } from '@/app/state/atoms';
+import { selectedCurrencyAtom } from '@/state/atoms';
 import PayQuotePage from '@/app/payin/[uuid]/pay/page';
 
 jest.mock('next/navigation', () => ({

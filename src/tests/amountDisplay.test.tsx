@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
-import { AmountDisplay } from '../components/ui/amountDisplay';
+import { AmountDisplay } from '../molecules/ui/amountDisplay';
 
 
 describe('AmountDisplay', () => {
