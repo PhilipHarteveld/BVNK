@@ -1,11 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useQuoteSummary } from "@/app/features/quote/hooks/useQuoteSummary";
-import { useEffect, useState } from "react";
+import { useQuoteSummary } from "@/app/payin/[uuid]/hooks/useQuoteSummary";
+import { useMemo } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useAtomValue } from "jotai";
-import { selectedCurrencyAtom } from "@/app/state/atoms";
+import { selectedCurrencyAtom } from "@/state/atoms";
+import { useCountdownTimer } from "@/hooks/useCountdownTimer";
 
 const currencyLabels: Record<string, string> = {
   BTC: "Bitcoin",
@@ -16,53 +17,35 @@ const currencyLabels: Record<string, string> = {
 export default function PayQuotePage() {
   const { uuid } = useParams() as { uuid: string };
   const { data: quote } = useQuoteSummary(uuid);
-  const [timeLeft, setTimeLeft] = useState<string>("");
 
   const selectedCurrency = useAtomValue(selectedCurrencyAtom);
+
+  // Ensure these hooks are always called, even if quote is undefined
+  const expiryDate = quote?.expiryDate;
   const currency = selectedCurrency || quote?.paidCurrency.currency;
+  const amount = quote?.paidCurrency.amount;
+  const address = quote?.address?.address ?? "Unknown";
 
-  useEffect(() => {
-    if (!quote?.expiryDate) return;
+  const timeLeft = useCountdownTimer(expiryDate, "hh:mm:ss");
 
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const secondsLeft = Math.floor((quote.expiryDate - now) / 1000);
+  const maskedAddress = useMemo(() => {
+    return address.length > 10
+      ? `${address.slice(0, 6)}...${address.slice(-5)}`
+      : address;
+  }, [address]);
 
-      if (secondsLeft <= 0) {
-        setTimeLeft("00:00:00");
-        clearInterval(interval);
-        return;
-      }
-
-      const hrs = Math.floor(secondsLeft / 3600).toString().padStart(2, "0");
-      const mins = Math.floor((secondsLeft % 3600) / 60).toString().padStart(2, "0");
-      const secs = (secondsLeft % 60).toString().padStart(2, "0");
-
-      setTimeLeft(`${hrs}:${mins}:${secs}`);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [quote?.expiryDate]);
-
+  // Now it's safe to return early
   if (!quote) return <div className="p-8">Loading...</div>;
-
-  const amount = quote.paidCurrency.amount;
-  const address = quote.address?.address ?? "Unknown";
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
   };
 
-  const maskedAddress =
-    address.length > 10
-      ? `${address.slice(0, 6)}...${address.slice(-5)}`
-      : address;
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f1f3f9] px-4">
       <div className="bg-white p-8 rounded-xl shadow w-full max-w-md text-center">
         <h2 className="text-lg font-medium mb-2 text-textColor">
-            Pay with {currencyLabels[currency as string] || currency}
+          Pay with {currencyLabels[currency as string] || currency}
         </h2>
 
         <p className="text-sm text-textHeading mb-6">
@@ -70,7 +53,7 @@ export default function PayQuotePage() {
         </p>
 
         <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span className=" text-textHeading">Amount due</span>
+          <span className="text-textHeading">Amount due</span>
           <span className="font-semibold text-textColor">
             {amount} {currency}
             <button
@@ -83,7 +66,7 @@ export default function PayQuotePage() {
         </div>
 
         <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span className=" text-textHeading">{currency} address</span>
+          <span className="text-textHeading">{currency} address</span>
           <span className="font-semibold text-textColor">
             {maskedAddress}
             <button
