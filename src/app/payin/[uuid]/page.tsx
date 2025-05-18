@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useQuoteSummary } from "@/app/payin/[uuid]/hooks/useQuoteSummary";
 import { acceptQuote, updateQuoteSummary } from "@/quote/api";
@@ -16,13 +16,28 @@ export default function AcceptQuotePage() {
   const router = useRouter();
   const { data: quote, refetch } = useQuoteSummary(uuid);
   const [selectedCurrency] = useAtom(selectedCurrencyAtom);
-  const timeLeft = useCountdownTimer(quote?.acceptanceExpiryDate || 0, "seconds");
+  const { timer, value: timeLeft } = useCountdownTimer("hh:mm:ss");
+
+  const redirect = useCallback(() => {
+    router.push(`/payin/${uuid}/expired`);
+    return null;
+  }, [uuid, router]);
 
   useEffect(() => {
     if (selectedCurrency) {
       updateQuoteSummary(uuid, selectedCurrency).then(() => refetch());
     }
   }, [selectedCurrency, uuid, refetch]);
+
+  useEffect(() => {
+    if (!quote?.acceptanceExpiryDate) return;
+    const { clear } = timer(quote.acceptanceExpiryDate, 1000, redirect);
+
+    return () => {
+      clear();
+    };
+
+  }, [quote?.acceptanceExpiryDate]);
 
   if (!quote?.uuid) return <div className="p-8">Loading...</div>;
 
@@ -44,9 +59,10 @@ export default function AcceptQuotePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f1f3f9] px-4">
       <div className="bg-white p-8 rounded-xl shadow w-full max-w-md">
-
         <div className="text-center mb-4">
-          <p className="text-textColor font-medium text-[20px] ">{quote.merchantDisplayName}</p>
+          <p className="text-textColor font-medium text-[20px] ">
+            {quote.merchantDisplayName}
+          </p>
           <p className="text-4xl font-bold mt-1 text-[32px] text-textColor">
             {quote?.displayCurrency?.currency} {quote?.displayCurrency?.amount}
           </p>
@@ -74,14 +90,10 @@ export default function AcceptQuotePage() {
                 </span>
               </div>
 
-              {typeof timeLeft === "number" && timeLeft > 0 && (
-                <div className="text-sm text-gray-600 flex justify-between pt-4 border-b pb-4">
-                  <span>Quoted price expires in</span>
-                  <span className="font-medium">
-                    {new Date(timeLeft * 1000).toISOString().substr(14, 5)}
-                  </span>
-                </div>
-              )}
+              <div className="text-sm text-gray-600 flex justify-between pt-4 border-b pb-4">
+                <span>Quoted price expires in</span>
+                <span className="font-medium">{timeLeft}</span>
+              </div>
             </div>
           )}
 

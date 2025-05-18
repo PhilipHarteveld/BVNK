@@ -1,12 +1,12 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { useQuoteSummary } from "@/app/payin/[uuid]/hooks/useQuoteSummary";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useAtomValue } from "jotai";
 import { selectedCurrencyAtom } from "@/state/atoms";
 import { useCountdownTimer } from "@/hooks/useCountdownTimer";
+import { useParams, useRouter } from "next/navigation";
 
 const currencyLabels: Record<string, string> = {
   BTC: "Bitcoin",
@@ -16,17 +16,35 @@ const currencyLabels: Record<string, string> = {
 
 export default function PayQuotePage() {
   const { uuid } = useParams() as { uuid: string };
+  const router = useRouter();
   const { data: quote } = useQuoteSummary(uuid);
 
   const selectedCurrency = useAtomValue(selectedCurrencyAtom);
 
-  // Ensure these hooks are always called, even if quote is undefined
-  const expiryDate = quote?.expiryDate;
+  
   const currency = selectedCurrency || quote?.paidCurrency.currency;
   const amount = quote?.paidCurrency.amount;
   const address = quote?.address?.address ?? "Unknown";
 
-  const timeLeft = useCountdownTimer(expiryDate, "hh:mm:ss");
+  const { timer, value: timeLeft } = useCountdownTimer("hh:mm:ss");
+
+  const redirect = useCallback(() => {
+    router.push(`/payin/${uuid}/expired`);
+    return null;
+  }, [uuid,router]);
+
+
+
+  useEffect(() => {
+    if (!quote?.expiryDate) return;
+    const { clear } = timer(quote.expiryDate, 1000, redirect);
+
+    return () => {
+      clear();
+    };
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quote?.expiryDate]);
 
   const maskedAddress = useMemo(() => {
     return address.length > 10
@@ -34,7 +52,7 @@ export default function PayQuotePage() {
       : address;
   }, [address]);
 
-  // Now it's safe to return early
+
   if (!quote) return <div className="p-8">Loading...</div>;
 
   const handleCopy = (text: string) => {
